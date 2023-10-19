@@ -1,5 +1,5 @@
 # testing model.py
-from model import AutoEncoderModel
+from ae_model import AutoEncoderModel
 import torch
 from torchvision import datasets
 from torchvision import transforms
@@ -33,10 +33,11 @@ decoder_layersizes = [9, 18, 36, 64, 128, 784]
 model = AutoEncoderModel(encoder_layersizes, decoder_layersizes)
 loss_function = torch.nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(),
-                              lr=1e-1,
+                              lr=1e-3,
                               weight_decay=1e-8)
 
 print(model)
+#print(list(model.parameters())[0].clone())
 epochs = 10
 outputs = []
 losses = []
@@ -60,7 +61,8 @@ for epoch in range(epochs):
     optimizer.step()
 
     # Storing the losses in a list for plotting
-    losses.append(loss)
+    losses.append(loss.detach().numpy())
+  #print(list(model.parameters())[0].clone())
   outputs.append((epochs, image, reconstructed))
 
 # Defining the Plot Style
@@ -69,7 +71,8 @@ plt.xlabel('Iterations')
 plt.ylabel('Loss')
 
 # Plotting the last 100 values
-plt.plot([loss.detach().numpy() for loss in losses[-100:]])
+#plt.plot([loss.detach().numpy() for loss in losses[-100:]])
+plt.plot(losses[-100:])
 plt.show()
 
 

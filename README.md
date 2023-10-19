@@ -11,3 +11,5 @@ Understanding relationships between complex combinations of OTUs and chronic dis
 - feed these to a transformer model to train
   - we can train the encoder
   - if we have matched input:output, can separately train the decoder side
+
+- CHIME database? not sure how it's spelled
