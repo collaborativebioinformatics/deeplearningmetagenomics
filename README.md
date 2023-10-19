@@ -1,8 +1,13 @@
 # deeplearningmetagenomics
 Understanding relationships between complex combinations of OTUs and chronic disease
 
-<object data="./CMUHack.pdf" type="application/pdf" width="700px" height="700px">
-    <embed src="./CMUHack.pdf">
-        <p>This browser does not support PDFs.</p>
-    </embed>
-</object>
+
+## Day 1 feedback
+- why use OTUs?
+- we can instead just use 16S reads to map to whole genomes
+- can feed the full gff3 file to PICRUST
+- use HMMer to convert whole genomes to sequences of domains
+- essentially like a corpus where each domain = a word
+- feed these to a transformer model to train
+  - we can train the encoder
+  - if we have matched input:output, can separately train the decoder side
