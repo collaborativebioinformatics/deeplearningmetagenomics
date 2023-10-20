@@ -13,6 +13,9 @@ suppressMessages(library(SynExtend))
 # a directory with HMMs in a somewhat specific format:
 # format is the HMMs saved as an xz compressed RData file, this makes them relatively lightweight
 # but forces us to eat a small amount of time uncompressing them
+# the associated hmm_breakouts.R script will create a series of RData files represeting
+# all the available types of models used by pfam, this script roughly expects the
+# 'family' type to be removed by the user
 # return:
 # RData files that include:
 # an RData file containing all called domains
