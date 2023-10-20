@@ -1,5 +1,7 @@
 ###### -- convert a metagenome into a table of domains ------------------------
 
+ScriptTimeStart <- Sys.time()
+
 suppressMessages(library(SynExtend))
 
 # requirements: SynExtend R package -- from bioconductor
@@ -8,10 +10,15 @@ suppressMessages(library(SynExtend))
 
 ###### -- arguments -----------------------------------------------------------
 # take in fasta file
-# a directory with HMMs in a somewhat specific format
-# return two RData files that are named after the input file, into the same directory
-# that the input file came from
-# compressed!
+# a directory with HMMs in a somewhat specific format:
+# format is the HMMs saved as an xz compressed RData file, this makes them relatively lightweight
+# but forces us to eat a small amount of time uncompressing them
+# return:
+# RData files that include:
+# an RData file containing all called domains
+# an RData file containing domains retained after some length thresholds are applied
+# an RData file containing domain counts for both previous tables -- including domains with zero occurrences
+# an RData file containing concatenated txt vectors for the domains in the sequences the appear in the data
 
 ARGS <- commandArgs(trailingOnly = TRUE)
 # example input:
@@ -48,9 +55,9 @@ CALLGENES <- paste0("prodigal -p meta -f gff -o ",
 tstart <- Sys.time()
 system(command = CALLGENES)
 tend <- Sys.time()
-print(paste("Genes called in",
-            tend - tstart,
-            "for",
+print("Genes called by Prodigal in:")
+print(tend - tstart)
+print(paste("For",
             length(dna),
             "contigs and",
             sum(width(dna)),
@@ -77,7 +84,6 @@ prots <- ExtractBy(x = z,
                    Verbose = TRUE)
 prots <- suppressWarnings(translate(x = prots,
                                     if.fuzzy.codon = "solve"))
-
 
 target_models <- list.files(path = MODEL_DIR,
                             full.names = TRUE)
@@ -143,12 +149,13 @@ HMMCOMMAND <- paste("hmmscan",
                     "--domE 1e-3",
                     hmmfile,
                     temp01)
-
+print("Starting HMMER")
 T1 <- Sys.time()
 system(command = HMMCOMMAND,
        ignore.stdout = TRUE,
        ignore.stderr = FALSE)
 T2 <- Sys.time()
+print("HMMER completed in:")
 print(T2 - T1)
 
 k2 <- readLines(temp02)
@@ -215,3 +222,36 @@ save(RetainedDomains,
                  pattern = "\\.fna$|\\.fasta$|\\.fa$",
                  replacement = "_retaineddomains.RData"),
      compress = "xz")
+
+# some other things:
+all_acc <- unlist(ModAcc)
+present_acc <- factor(x = DomainTable$target_accession,
+                      levels = all_acc)
+all_freq <- table(present_acc)
+retained_acc <- factor(x = RetainedDomains$target_accession,
+                       levels = all_acc)
+retained_freq <- table(retained_acc)
+
+save(all_freq,
+     retained_freq,
+     file = gsub(x = INPUT,
+                 pattern = "\\.fna$|\\.fasta$|\\.fa$",
+                 replacement = "_domaincounts.RData"),
+     compress = "xz")
+
+all_dm <- paste(DomainTable$target_accession,
+                collapse = " ")
+retained_dm <- paste(RetainedDomains$target_accession,
+                     collapse = " ")
+save(all_dm,
+     retained_dm,
+     file = gsub(x = INPUT,
+                 pattern = "\\.fna$|\\.fasta$|\\.fa$",
+                 replacement = "_seqtext.RData"),
+     compress = "xz")
+
+ScriptTimeEnd <- Sys.time()
+
+print("All Done! Total script time:")
+print(ScriptTimeEnd - ScriptTimeStart)
+
