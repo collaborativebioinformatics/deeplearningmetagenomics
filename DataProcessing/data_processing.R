@@ -21,6 +21,8 @@ INPUT <- ARGS[1L]
 MODEL_DIR <- ARGS[2L]
 if (length(ARGS) < 3L) {
   LIM <- 10000
+} else {
+  LIM <- as.integer(ARGS[3L])
 }
 # will return the example output:
 # ~/Downloads/nmdc/nmdc_mga0wn63_contigs.RData
