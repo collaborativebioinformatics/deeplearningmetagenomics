@@ -202,7 +202,7 @@ RetainedDomains <- DomainTable[HMM_Footprint >= DomainTable$tlen * DomLL &
                                  ENV_Footprint >= (HMM_Footprint * DomLL), ]
 
 # save all domains
-save(DomtainTable,
+save(DomainTable,
      file = gsub(x = INPUT,
                  pattern = "\\.fna$|\\.fasta$|\\.fa$",
                  replacement = "_alldomains.RData"),
